@@ -3,8 +3,9 @@
 当准备运行量化交易策略或进行盘前自检时，按照以下步骤依次执行：
 
 ## 步骤 1：客户端与环境检查
-1. 确认 Windows 虚拟机 / 实体机上的 MiniQMT (迅投) 客户端已启动并完成交易登录。
-2. 确认 `src/config/config.ini` 中的 `userdata_mini_path` 路径正确指向客户端的 `userdata_mini` 文件夹。
+1. 激活 Python 虚拟环境：`source /Users/zhouyi/workplace/python/quant/qmt/.venv/bin/activate`。
+2. 确认 Windows 虚拟机 / 实体机上的 MiniQMT (迅投) 客户端已启动并完成交易登录。
+3. 确认 `src/config/config.ini` 中的 `userdata_mini_path` 路径正确指向客户端的 `userdata_mini` 文件夹。
 
 ## 步骤 2：数据库连通性自检
 1. 检查 MongoDB 实例已启动并可正常连接。

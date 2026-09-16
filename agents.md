@@ -292,3 +292,8 @@ def fetch_history_data(stock_code: str, period: str = '1d', start_time: str = '2
 4. **测试与日常运维规范**：
    - 使用 `service/test_market_data.py` 进行行情接口验证与调试。
    - 定期执行 `make clean` 清除 `__pycache__` 与编译临时缓存。
+5. **Python 运行与虚拟环境规范**：
+   - 虚拟环境激活路径：`source /Users/zhouyi/workplace/python/quant/qmt/.venv/bin/activate`
+   - Python 解释器直接路径：`/Users/zhouyi/workplace/python/quant/qmt/.venv/bin/python`
+   - 运行任何脚本、执行依赖管理或测试时，必须使用此虚拟环境。
+
