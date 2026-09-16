@@ -1,37 +1,32 @@
 # coding=gbk
 """
-å®æ—¶ä»·æ ¼è·å–ç¤ºä¾‹ï¼šä½¿ç”¨ get_market_data_ex è·å–è‚¡ç¥¨å½“å‰æ—¶åˆ»æœ€æ–°ä»·æ ¼
+ÊµÊ±¼Û¸ñ»ñÈ¡Ê¾Àı£ºÊ¹ÓÃ get_market_data_ex »ñÈ¡¹ÉÆ±µ±Ç°Ê±¿Ì×îĞÂ¼Û¸ñ
 """
 from xtquant import xtdata
 import datetime
 import time
 
-'''
-è·å–è‚¡ç¥¨ç›¸å…³ä¿¡æ¯
-1. è·å–è‚¡ç¥¨å®æ—¶ä»·æ ¼
-'''
-
 
 def get_realtime_price(stock_code):
     """
-    è·å–è‚¡ç¥¨å®æ—¶ä»·æ ¼
+    »ñÈ¡¹ÉÆ±ÊµÊ±¼Û¸ñ
 
     Args:
-        stock_code (str): è‚¡ç¥¨ä»£ç ï¼Œå¦‚ '000001.SZ'
+        stock_code (str): ¹ÉÆ±´úÂë£¬Èç '000001.SZ'
 
     Returns:
-        float: è‚¡ç¥¨å®æ—¶ä»·æ ¼
+        float: ¹ÉÆ±ÊµÊ±¼Û¸ñ
     """
     today = datetime.datetime.now().strftime('%Y%m%d')
 
-    # ä½¿ç”¨1åˆ†é’Ÿå‘¨æœŸè·å–å®æ—¶ä»·æ ¼
+    # Ê¹ÓÃ1·ÖÖÓÖÜÆÚ»ñÈ¡ÊµÊ±¼Û¸ñ
     market_data = xtdata.get_market_data_ex(
         field_list=['close'],
         stock_list=[stock_code],
-        period='1m',  # 1åˆ†é’Ÿå‘¨æœŸ
-        start_time=today + '0930',  # å¼€ç›˜æ—¶é—´
-        end_time=today + '1500',  # æ”¶ç›˜æ—¶é—´
-        count=1  # è·å–æœ€æ–°1æ¡æ•°æ®
+        period='1m',  # 1·ÖÖÓÖÜÆÚ
+        start_time=today + '0930',  # ¿ªÅÌÊ±¼ä
+        end_time=today + '1500',  # ÊÕÅÌÊ±¼ä
+        count=1  # »ñÈ¡×îĞÂ1ÌõÊı¾İ
     )
 
     if market_data and stock_code in market_data and len(market_data[stock_code]) > 0:
@@ -41,14 +36,14 @@ def get_realtime_price(stock_code):
 
 def monitor_price(stock_code, interval=5):
     """
-    æŒç»­ç›‘æ§è‚¡ç¥¨ä»·æ ¼
+    ³ÖĞø¼à¿Ø¹ÉÆ±¼Û¸ñ
 
     Args:
-        stock_code (str): è‚¡ç¥¨ä»£ç 
-        interval (int): ç›‘æ§é—´éš”ï¼ˆç§’ï¼‰
+        stock_code (str): ¹ÉÆ±´úÂë
+        interval (int): ¼à¿Ø¼ä¸ô£¨Ãë£©
     """
-    print(f"å¼€å§‹ç›‘æ§è‚¡ç¥¨ {stock_code} çš„å®æ—¶ä»·æ ¼ï¼Œé—´éš” {interval} ç§’")
-    print("æŒ‰ Ctrl+C åœæ­¢ç›‘æ§")
+    print(f"¿ªÊ¼¼à¿Ø¹ÉÆ± {stock_code} µÄÊµÊ±¼Û¸ñ£¬¼ä¸ô {interval} Ãë")
+    print("°´ Ctrl+C Í£Ö¹¼à¿Ø")
 
     try:
         while True:
@@ -58,23 +53,23 @@ def monitor_price(stock_code, interval=5):
             if price > 0:
                 print(f"[{current_time}] {stock_code}: {price}")
             else:
-                print(f"[{current_time}] {stock_code}: æ— æ³•è·å–ä»·æ ¼")
+                print(f"[{current_time}] {stock_code}: ÎŞ·¨»ñÈ¡¼Û¸ñ")
 
             time.sleep(interval)
 
     except KeyboardInterrupt:
-        print("\nç›‘æ§å·²åœæ­¢")
+        print("\n¼à¿ØÒÑÍ£Ö¹")
 
 
 def get_multiple_realtime_prices(stock_codes):
     """
-    æ‰¹é‡è·å–å¤šä¸ªè‚¡ç¥¨çš„å®æ—¶ä»·æ ¼
+    ÅúÁ¿»ñÈ¡¶à¸ö¹ÉÆ±µÄÊµÊ±¼Û¸ñ
 
     Args:
-        stock_codes (list): è‚¡ç¥¨ä»£ç åˆ—è¡¨
+        stock_codes (list): ¹ÉÆ±´úÂëÁĞ±í
 
     Returns:
-        dict: è‚¡ç¥¨ä»£ç å’Œä»·æ ¼çš„å­—å…¸
+        dict: ¹ÉÆ±´úÂëºÍ¼Û¸ñµÄ×Öµä
     """
     today = datetime.datetime.now().strftime('%Y%m%d')
 
@@ -98,21 +93,17 @@ def get_multiple_realtime_prices(stock_codes):
 
 
 if __name__ == "__main__":
-    # ç¤ºä¾‹1ï¼šè·å–å•ä¸ªè‚¡ç¥¨å®æ—¶ä»·æ ¼
-    print("=== è·å–å•ä¸ªè‚¡ç¥¨å®æ—¶ä»·æ ¼ ===")
+    # Ê¾Àı1£º»ñÈ¡µ¥¸ö¹ÉÆ±ÊµÊ±¼Û¸ñ
+    print("=== »ñÈ¡µ¥¸ö¹ÉÆ±ÊµÊ±¼Û¸ñ ===")
     price = get_realtime_price('000001.SZ')
-    print(f"å¹³å®‰é“¶è¡Œå®æ—¶ä»·æ ¼: {price}")
+    print(f"Æ½°²ÒøĞĞÊµÊ±¼Û¸ñ: {price}")
 
-    # ç¤ºä¾‹2ï¼šæ‰¹é‡è·å–å¤šä¸ªè‚¡ç¥¨å®æ—¶ä»·æ ¼
-    print("\n=== æ‰¹é‡è·å–å¤šä¸ªè‚¡ç¥¨å®æ—¶ä»·æ ¼ ===")
+    # Ê¾Àı2£ºÅúÁ¿»ñÈ¡¶à¸ö¹ÉÆ±ÊµÊ±¼Û¸ñ
+    print("\n=== ÅúÁ¿»ñÈ¡¶à¸ö¹ÉÆ±ÊµÊ±¼Û¸ñ ===")
     stock_list = ['000001.SZ', '600519.SH', '002878.SZ']
     prices = get_multiple_realtime_prices(stock_list)
 
     current_time = datetime.datetime.now().strftime('%H:%M:%S')
-    print(f"[{current_time}] å®æ—¶ä»·æ ¼æ±‡æ€»:")
+    print(f"[{current_time}] ÊµÊ±¼Û¸ñ»ã×Ü:")
     for code, price in prices.items():
         print(f"  {code}: {price}")
-
-    # ç¤ºä¾‹3ï¼šæŒç»­ç›‘æ§ä»·æ ¼ï¼ˆå¯é€‰ï¼‰
-    # print("\n=== å¼€å§‹ä»·æ ¼ç›‘æ§ ===")
-    # monitor_price('000001.SZ', interval=10)

@@ -4,9 +4,16 @@ import datetime
 from src.db.order_model import OrderModel
 
 
-def update_order(orders: XtOrder):
+def update_order(orders):
+    """
+    同步委托订单信息至数据库
+    :param orders: XtOrder 对象列表或单个 XtOrder
+    """
+    if not orders:
+        return
+    if not isinstance(orders, list):
+        orders = [orders]
 
-    # 取锟剿猴拷锟斤拷息
     for order in orders:
         model = OrderModel.objects(order_id=order.order_id).first()
         if model is None:
@@ -29,28 +36,5 @@ def update_order(orders: XtOrder):
         model.status_msg = order.status_msg
         model.strategy_name = order.strategy_name
         model.order_remark = order.order_remark
-        model.update_time = datetime.datetime.now()
-        model.save()
-
-
-def update_position(positions: XtPosition):
-
-    # 取锟剿猴拷锟斤拷息
-    for position in positions:
-        model = PositionModel.objects(stock_code=position.stock_code).first()
-        if model is None:
-            model = PositionModel()
-            model.create_time = datetime.datetime.now()
-
-        model.account_type = position.account_type
-        model.account_id = position.account_id
-        model.stock_code = position.stock_code
-        model.volume = position.volume
-        model.can_use_volume = position.can_use_volume
-        model.open_price = position.open_price
-        model.market_value = position.market_value
-        model.frozen_volume = position.frozen_volume
-        model.on_road_volume = position.on_road_volume
-        model.yesterday_volume = position.yesterday_volume
         model.update_time = datetime.datetime.now()
         model.save()

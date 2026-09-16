@@ -3,19 +3,23 @@ from xtquant.xtpythonclient import XtTrade
 import datetime
 from src.db.trade_model import TradeModel
 
-# 更新交易记录
 
+def update_trade(trades):
+    """
+    同步成交记录至数据库
+    :param trades: XtTrade 对象列表或单个 XtTrade
+    """
+    if not trades:
+        return
+    if not isinstance(trades, list):
+        trades = [trades]
 
-def update_trade(trades: XtTrade):
-
-    # 取账号信息
     for trade in trades:
         model = TradeModel.objects(traded_id=trade.traded_id).first()
         if model is None:
             model = TradeModel()
             model.create_time = datetime.datetime.now()
 
-        # 更新交易记录
         model.account_type = trade.account_type
         model.account_id = trade.account_id
         model.stock_code = trade.stock_code

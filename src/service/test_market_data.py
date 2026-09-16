@@ -1,6 +1,6 @@
 # coding=gbk
 """
-æµ‹è¯• get_market_data_ex åŠŸèƒ½
+²âÊÔ get_market_data_ex ¹¦ÄÜ
 """
 
 import datetime
@@ -9,19 +9,16 @@ from xtquant import xtdata
 
 def test_get_market_data_ex():
     """
-    æµ‹è¯• get_market_data_ex çš„å„ç§ç”¨æ³•
+    ²âÊÔ get_market_data_ex µÄ¸÷ÖÖÓÃ·¨
     """
-    # æµ‹è¯•è‚¡ç¥¨ä»£ç 
     test_stock = "000001.SZ"
+    print(f"=== ²âÊÔ¹ÉÆ±: {test_stock} ===")
 
-    print(f"=== æµ‹è¯•è‚¡ç¥¨: {test_stock} ===")
-
-    # è·å–å½“å‰æ—¥æœŸ
     today = datetime.datetime.now().strftime('%Y%m%d')
-    print(f"å½“å‰æ—¥æœŸ: {today}")
+    print(f"µ±Ç°ÈÕÆÚ: {today}")
 
-    # æµ‹è¯•1ï¼šè·å–å½“æ—¥åˆ†æ—¶æ•°æ®
-    print("\n1. æµ‹è¯•è·å–å½“æ—¥åˆ†æ—¶æ•°æ®:")
+    # ²âÊÔ1£º»ñÈ¡µ±ÈÕ·ÖÊ±Êı¾İ
+    print("\n1. ²âÊÔ»ñÈ¡µ±ÈÕ·ÖÊ±Êı¾İ:")
     try:
         minute_data = xtdata.get_market_data_ex(
             field_list=['close', 'open', 'high', 'low', 'volume'],
@@ -29,22 +26,22 @@ def test_get_market_data_ex():
             period='1m',
             start_time=today + '0930',
             end_time=today + '1500',
-            count=5  # è·å–æœ€è¿‘5æ¡æ•°æ®
+            count=5
         )
 
         if minute_data and len(minute_data) > 0:
-            print(f"è·å–åˆ° {len(minute_data)} ä¸ªå­—æ®µçš„æ•°æ®")
+            print(f"»ñÈ¡µ½ {len(minute_data)} ¸ö×Ö¶ÎµÄÊı¾İ")
             for i, field_data in enumerate(minute_data):
                 if len(field_data) > 0:
-                    print(f"å­—æ®µ {i}: æœ€æ–°å€¼ = {field_data[-1]}")
+                    print(f"×Ö¶Î {i}: ×îĞÂÖµ = {field_data[-1]}")
         else:
-            print("æœªè·å–åˆ°åˆ†æ—¶æ•°æ®")
+            print("Î´»ñÈ¡µ½·ÖÊ±Êı¾İ")
 
     except Exception as e:
-        print(f"è·å–åˆ†æ—¶æ•°æ®å¤±è´¥: {e}")
+        print(f"»ñÈ¡·ÖÊ±Êı¾İÊ§°Ü: {e}")
 
-    # æµ‹è¯•2ï¼šè·å–å½“æ—¥æ—¥çº¿æ•°æ®
-    print("\n2. æµ‹è¯•è·å–å½“æ—¥æ—¥çº¿æ•°æ®:")
+    # ²âÊÔ2£º»ñÈ¡µ±ÈÕÈÕÏßÊı¾İ
+    print("\n2. ²âÊÔ»ñÈ¡µ±ÈÕÈÕÏßÊı¾İ:")
     try:
         daily_data = xtdata.get_market_data_ex(
             field_list=['close', 'open', 'high', 'low', 'volume'],
@@ -56,65 +53,26 @@ def test_get_market_data_ex():
         )
 
         if daily_data and len(daily_data) > 0:
-            print(f"è·å–åˆ° {len(daily_data)} ä¸ªå­—æ®µçš„æ—¥çº¿æ•°æ®")
+            print(f"»ñÈ¡µ½ {len(daily_data)} ¸ö×Ö¶ÎµÄÈÕÏßÊı¾İ")
             for i, field_data in enumerate(daily_data):
                 if len(field_data) > 0:
-                    print(f"å­—æ®µ {i}: å€¼ = {field_data[-1]}")
+                    print(f"×Ö¶Î {i}: Öµ = {field_data[-1]}")
         else:
-            print("æœªè·å–åˆ°æ—¥çº¿æ•°æ®")
+            print("Î´»ñÈ¡µ½ÈÕÏßÊı¾İ")
 
     except Exception as e:
-        print(f"è·å–æ—¥çº¿æ•°æ®å¤±è´¥: {e}")
-
-    # æµ‹è¯•3ï¼šè·å–å†å²æ•°æ®
-    print("\n3. æµ‹è¯•è·å–å†å²æ•°æ®:")
-    try:
-        start_date = (datetime.datetime.now() -
-                      datetime.timedelta(days=5)).strftime('%Y%m%d')
-
-        historical_data = xtdata.get_market_data_ex(
-            field_list=['close'],
-            stock_list=[test_stock],
-            period='1d',
-            start_time=start_date,
-            end_time=today,
-            count=5
-        )
-
-        if historical_data and len(historical_data) > 0 and len(historical_data[0]) > 0:
-            print(f"è·å–åˆ° {len(historical_data[0])} å¤©çš„å†å²æ”¶ç›˜ä»·:")
-            for i, price in enumerate(historical_data[0]):
-                print(f"ç¬¬ {i+1} å¤©: {price}")
-        else:
-            print("æœªè·å–åˆ°å†å²æ•°æ®")
-
-    except Exception as e:
-        print(f"è·å–å†å²æ•°æ®å¤±è´¥: {e}")
-
-    # æµ‹è¯•4ï¼šæµ‹è¯•ä»·æ ¼è·å–å‡½æ•°
-    print("\n4. æµ‹è¯•ä»·æ ¼è·å–å‡½æ•°:")
-    try:
-        from src.stock.trander.trading_demo import get_current_price
-
-        current_price = get_current_price(test_stock)
-        print(f"è·å–åˆ°çš„å½“å‰ä»·æ ¼: {current_price}")
-
-    except Exception as e:
-        print(f"æµ‹è¯•ä»·æ ¼è·å–å‡½æ•°å¤±è´¥: {e}")
+        print(f"»ñÈ¡ÈÕÏßÊı¾İÊ§°Ü: {e}")
 
 
 def test_multiple_stocks():
     """
-    æµ‹è¯•å¤šåªè‚¡ç¥¨çš„æ•°æ®è·å–
+    ²âÊÔ¶àÖ»¹ÉÆ±µÄÊı¾İ»ñÈ¡
     """
     test_stocks = ["000001.SZ", "000002.SZ", "600000.SH"]
-
-    print(f"\n=== æµ‹è¯•å¤šåªè‚¡ç¥¨: {test_stocks} ===")
-
+    print(f"\n=== ²âÊÔ¶àÖ»¹ÉÆ±: {test_stocks} ===")
     today = datetime.datetime.now().strftime('%Y%m%d')
 
     try:
-        # è·å–å¤šåªè‚¡ç¥¨çš„æ”¶ç›˜ä»·
         multi_data = xtdata.get_market_data_ex(
             field_list=['close'],
             stock_list=test_stocks,
@@ -125,25 +83,23 @@ def test_multiple_stocks():
         )
 
         if multi_data and len(multi_data) > 0:
-            print(f"è·å–åˆ° {len(multi_data[0])} åªè‚¡ç¥¨çš„æ•°æ®:")
+            print(f"»ñÈ¡µ½ {len(multi_data[0])} Ö»¹ÉÆ±µÄÊı¾İ:")
             for i, price in enumerate(multi_data[0]):
                 if i < len(test_stocks):
                     print(f"{test_stocks[i]}: {price}")
         else:
-            print("æœªè·å–åˆ°å¤šåªè‚¡ç¥¨æ•°æ®")
+            print("Î´»ñÈ¡µ½¶àÖ»¹ÉÆ±Êı¾İ")
 
     except Exception as e:
-        print(f"è·å–å¤šåªè‚¡ç¥¨æ•°æ®å¤±è´¥: {e}")
+        print(f"»ñÈ¡¶àÖ»¹ÉÆ±Êı¾İÊ§°Ü: {e}")
 
 
 if __name__ == '__main__':
-    # åˆå§‹åŒ–xtdata
     try:
         xtdata.download_sector_data()
-        print("xtdataåˆå§‹åŒ–æˆåŠŸ")
+        print("xtdata³õÊ¼»¯³É¹¦")
     except Exception as e:
-        print(f"xtdataåˆå§‹åŒ–å¤±è´¥: {e}")
+        print(f"xtdata³õÊ¼»¯Ê§°Ü: {e}")
 
-    # è¿è¡Œæµ‹è¯•
     test_get_market_data_ex()
     test_multiple_stocks()

@@ -3,56 +3,54 @@ from mongoengine import StringField, IntField, FloatField, BooleanField, DateTim
 from src.db.base_model import BaseModel
 
 '''
-account_type	int	ï¿½Ëºï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-account_id	str	ï¿½Ê½ï¿½ï¿½Ëºï¿½
-stock_code	str	Ö¤È¯ï¿½ï¿½ï¿½ï¿½
-order_type	int	Î¯ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-traded_id	str	ï¿½É½ï¿½ï¿½ï¿½ï¿½
-traded_time	int	ï¿½É½ï¿½Ê±ï¿½ï¿½
-traded_price	float	ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
-traded_volume	int	ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
-traded_amount	float	ï¿½É½ï¿½ï¿½ï¿½ï¿½
-order_id	int	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-order_sysid	str	ï¿½ï¿½Ì¨ï¿½ï¿½Í¬ï¿½ï¿½ï¿½
-strategy_name	str	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-order_remark	str	Î¯ï¿½Ð±ï¿½×¢ï¿½ï¿½ï¿½ï¿½ï¿½ 24 ï¿½ï¿½Ó¢ï¿½ï¿½ï¿½Ö·ï¿½(
-direction	int	ï¿½ï¿½Õ·ï¿½ï¿½ò£¬¹ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-offset_flag	int	ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú»ï¿½ï¿½ï¿½ï¿½ï¿½Æ½ï¿½Ö£ï¿½ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-
+account_type    int     ÕËºÅÀàÐÍ£¬²Î¼ûÊý¾Ý×Öµä
+account_id      str     ×Ê½ðÕËºÅ
+stock_code      str     Ö¤È¯´úÂë
+order_type      int     Î¯ÍÐÀàÐÍ£¬²Î¼ûÊý¾Ý×Öµä
+traded_id       str     ³É½»±àºÅ
+traded_time     int     ³É½»Ê±¼ä
+traded_price    float   ³É½»¾ù¼Û
+traded_volume   int     ³É½»ÊýÁ¿
+traded_amount   float   ³É½»½ð¶î
+order_id        int     ¶©µ¥±àºÅ
+order_sysid     str     ¹ñÌ¨ºÏÍ¬±àºÅ
+strategy_name   str     ²ßÂÔÃû³Æ
+order_remark    str     Î¯ÍÐ±¸×¢£¬×î¶à 24 ¸öÓ¢ÎÄ×Ö·û
+direction       int     ¶à¿Õ·½Ïò£¬¹ÉÆ±²»ÊÊÓÃ
+offset_flag     int     ¿ªÆ½±êÖ¾£¬¹ÉÆ±²»ÊÊÓÃ
 '''
 
-# ï¿½É½ï¿½
 
-
+# ³É½»¼ÇÂ¼Ä£ÐÍ
 class TradeModel(BaseModel):
     meta = {'collection': 'tb_trade'}
-    # ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½
+    # ÕËºÅÀàÐÍ
     account_type = IntField()
-    # ï¿½Ê½ï¿½ï¿½Ëºï¿½
+    # ×Ê½ðÕËºÅ
     account_id = StringField()
-    # Ö¤È¯ï¿½ï¿½ï¿½ï¿½
+    # Ö¤È¯´úÂë
     stock_code = StringField()
-    # Î¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # Î¯ÍÐÀàÐÍ
     order_type = IntField()
-    # ï¿½É½ï¿½ï¿½ï¿½ï¿½
+    # ³É½»±àºÅ
     traded_id = StringField()
-    # ï¿½É½ï¿½Ê±ï¿½ï¿½
+    # ³É½»Ê±¼ä
     traded_time = IntField()
-    # ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ³É½»¾ù¼Û
     traded_price = FloatField()
-    # ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ³É½»ÊýÁ¿
     traded_volume = IntField()
-    # ï¿½É½ï¿½ï¿½ï¿½ï¿½
+    # ³É½»½ð¶î
     traded_amount = FloatField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ¶©µ¥±àºÅ
     order_id = IntField()
-    # ï¿½ï¿½Ì¨ï¿½ï¿½Í¬ï¿½ï¿½ï¿½
+    # ¹ñÌ¨ºÏÍ¬±àºÅ
     order_sysid = StringField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ²ßÂÔÃû³Æ
     strategy_name = StringField()
-    # Î¯ï¿½Ð±ï¿½×¢
+    # Î¯ÍÐ±¸×¢
     order_remark = StringField()
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ´´½¨Ê±¼ä
     create_time = DateTimeField()
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ¸üÐÂÊ±¼ä
     update_time = DateTimeField()

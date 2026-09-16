@@ -1,6 +1,6 @@
 # Python Quant Project Makefile
 
-.PHONY: clean help
+.PHONY: clean 
 
 # Clean all temporary files including __pycache__
 clean:
@@ -11,8 +11,8 @@ clean:
 	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
 
-# Show help
-help:
-	@echo "Available commands:"
-	@echo "  clean        - Remove all temporary files including __pycache__"
-	@echo "  help         - Show this help message"
+m ?= update
+commit:
+	git add .
+	git commit -m "$(m)" || true
+	git push

@@ -1,5 +1,5 @@
 # coding=gbk
 from src.db.mongo import init_mongodb
 
-# 鍒濆鍖栨暟鎹簱
+# 初始化数据库
 init_mongodb()

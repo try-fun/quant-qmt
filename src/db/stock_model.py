@@ -5,56 +5,56 @@ from src.db.base_model import BaseModel
 
 class StockModel(BaseModel):
     meta = {'collection': 'tb_stock'}
-    # ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½
+    # ¹ÉÆ±´úÂë
     code = StringField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ID
+    # ½»Ò×ËùID
     exchange_id = StringField()
-    # ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½
+    # ºÏÔ¼´úÂë
     instrument_id = StringField()
-    # ï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½
+    # Ö¤È¯Ãû³Æ
     instrument_name = StringField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ÉÏÊÐÈÕÆÚ
     open_date = StringField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ÍËÊÐÈÕÆÚ
     expire_date = IntField()
-    # Ç°ï¿½ï¿½ï¿½Ì¼ï¿½
+    # Ç°ÊÕÅÌ¼Û
     pre_close = FloatField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ½áËã¼Û
     settlement_price = FloatField()
-    # ï¿½ï¿½Í£ï¿½ï¿½
+    # ÕÇÍ£¼Û
     up_stop_price = FloatField()
-    # ï¿½ï¿½Í£ï¿½ï¿½
+    # µøÍ£¼Û
     down_stop_price = FloatField()
-    # ï¿½ï¿½Í¨ï¿½ï¿½Öµ
+    # Á÷Í¨¹É±¾
     float_volume = FloatField()
-    # ï¿½ï¿½ï¿½ï¿½Öµ
+    # ×Ü¹É±¾
     total_volume = FloatField()
-    # ï¿½ï¿½Æ±×´Ì¬
+    # Ö¤È¯×´Ì¬
     instrument_status = IntField()
-    # ï¿½Ç·ï¿½ï¿½ï¿½
+    # ÊÇ·ñ½»Ò×
     is_trading = BooleanField()
 
-    # ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ÊÇ·ñÒÑÂòÈë
     is_buy = BooleanField()
 
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ´´½¨Ê±¼ä
     create_time = DateTimeField()
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ¸üÐÂÊ±¼ä
     update_time = StringField()
 
 
 if __name__ == '__main__':
-    # ï¿½ï¿½ï¿½ï¿½
+    # Ôö¼Ó
     user = StockModel.add({'name': 'Tom', 'age': 25})
     print(user.to_json())
-    # ï¿½ï¿½ï¿½ï¿½
+    # ¸üÐÂ
     StockModel.update(user.id, {'age': 26})
-    # ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½
+    # ²éÑ¯ÁÐ±í
     users = StockModel.list()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯
+    # Ìõ¼þ²éÑ¯
     users_named_tom = StockModel.list_by({'name': 'Tom'})
-    # ï¿½ï¿½Ò³
+    # ·ÖÒ³
     page_data = StockModel.page(page=1, page_size=2)
     print(page_data)
-    # É¾ï¿½ï¿½
+    # É¾³ý
     # StockModel.delete(str(user.id))

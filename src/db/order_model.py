@@ -2,68 +2,64 @@
 from mongoengine import StringField, IntField, FloatField, BooleanField, DateTimeField
 from src.db.base_model import BaseModel
 
-
 '''
-account_type	int	ï¿½Ëºï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-account_id	str	ï¿½Ê½ï¿½ï¿½Ëºï¿½
-stock_code	str	Ö¤È¯ï¿½ï¿½ï¿½ë£¬ï¿½ï¿½ï¿½ï¿½"600000.SH"
-order_id	int	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-order_sysid	str	ï¿½ï¿½Ì¨ï¿½ï¿½Í¬ï¿½ï¿½ï¿½
-order_time	int	ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
-order_type	int	Î¯ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-order_volume	int	Î¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-price_type	int	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½Ú·ï¿½ï¿½ï¿½Ê±Îªï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½price_typeï¿½ï¿½Ã¶ï¿½ï¿½Öµï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-price	float	Î¯ï¿½Ð¼Û¸ï¿½
-traded_volume	int	ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
-traded_price	float	ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
-order_status	int	Î¯ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-status_msg	str	Î¯ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½Ô­ï¿½ï¿½
-strategy_name	str	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-order_remark	str	Î¯ï¿½Ð±ï¿½×¢ï¿½ï¿½ï¿½ï¿½ï¿½ 24 ï¿½ï¿½Ó¢ï¿½ï¿½ï¿½Ö·ï¿½
-direction	int	ï¿½ï¿½Õ·ï¿½ï¿½ò£¬¹ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-offset_flag	int	ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú»ï¿½ï¿½ï¿½ï¿½ï¿½Æ½ï¿½Ö£ï¿½ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
-
-
+account_type    int     ÕËºÅÀàÐÍ£¬²Î¼ûÊý¾Ý×Öµä
+account_id      str     ×Ê½ðÕËºÅ
+stock_code      str     Ö¤È¯´úÂë£¬ÀýÈç"600000.SH"
+order_id        int     ¶©µ¥±àºÅ
+order_sysid     str     ¹ñÌ¨ºÏÍ¬±àºÅ
+order_time      int     ±¨µ¥Ê±¼ä
+order_type      int     Î¯ÍÐÀàÐÍ£¬²Î¼ûÊý¾Ý×Öµä
+order_volume    int     Î¯ÍÐÊýÁ¿
+price_type      int     ±¨¼ÛÀàÐÍ£¬²Î¼ûÊý¾Ý×Öµä
+price           float   Î¯ÍÐ¼Û¸ñ
+traded_volume   int     ³É½»ÊýÁ¿
+traded_price    float   ³É½»¾ù¼Û
+order_status    int     Î¯ÍÐ×´Ì¬£¬²Î¼ûÊý¾Ý×Öµä
+status_msg      str     Î¯ÍÐ×´Ì¬ÃèÊö£¬Èç·Ïµ¥Ô­Òò
+strategy_name   str     ²ßÂÔÃû³Æ
+order_remark    str     Î¯ÍÐ±¸×¢£¬×î¶à 24 ¸öÓ¢ÎÄ×Ö·û
+direction       int     ¶à¿Õ·½Ïò£¬¹ÉÆ±²»ÊÊÓÃ
+offset_flag     int     ¿ªÆ½±êÖ¾£¬¹ÉÆ±²»ÊÊÓÃ
 '''
 
-# Î¯ï¿½Ðµï¿½
 
-
+# Î¯ÍÐ¶©µ¥Ä£ÐÍ
 class OrderModel(BaseModel):
     meta = {'collection': 'tb_order'}
-    # ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½
+    # ÕËºÅÀàÐÍ
     account_type = IntField()
-    # ï¿½Ê½ï¿½ï¿½Ëºï¿½
+    # ×Ê½ðÕËºÅ
     account_id = StringField()
-    # Ö¤È¯ï¿½ï¿½ï¿½ï¿½
+    # Ö¤È¯´úÂë
     stock_code = StringField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ¶©µ¥±àºÅ
     order_id = IntField()
-    # ï¿½ï¿½Ì¨ï¿½ï¿½Í¬ï¿½ï¿½ï¿½
+    # ¹ñÌ¨ºÏÍ¬±àºÅ
     order_sysid = StringField()
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ±¨µ¥Ê±¼ä
     order_time = IntField()
-    # Î¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # Î¯ÍÐÀàÐÍ
     order_type = IntField()
-    # Î¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # Î¯ÍÐÊýÁ¿
     order_volume = IntField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ±¨¼ÛÀàÐÍ
     price_type = IntField()
-    # Î¯ï¿½Ð¼Û¸ï¿½
+    # Î¯ÍÐ¼Û¸ñ
     price = FloatField()
-    # ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ³É½»ÊýÁ¿
     traded_volume = IntField()
-    # ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ³É½»¾ù¼Û
     traded_price = FloatField()
-    # Î¯ï¿½ï¿½×´Ì¬
+    # Î¯ÍÐ×´Ì¬
     order_status = IntField()
-    # Î¯ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½
+    # Î¯ÍÐ×´Ì¬ÃèÊö
     status_msg = StringField()
-    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    # ²ßÂÔÃû³Æ
     strategy_name = StringField()
-    # Î¯ï¿½Ð±ï¿½×¢
+    # Î¯ÍÐ±¸×¢
     order_remark = StringField()
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ´´½¨Ê±¼ä
     create_time = DateTimeField()
-    # ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    # ¸üÐÂÊ±¼ä
     update_time = DateTimeField()
