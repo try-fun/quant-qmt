@@ -16,3 +16,4 @@ commit:
 	git add .
 	git commit -m "$(m)" || true
 	git push
+
