@@ -4,6 +4,13 @@ A股多因子共振与布林带策略 - 盘后选股器
 每日 15:10 后运行，实现全市场基础过滤、三大技术指标共振初筛以及强势股精选 (Top 20)
 """
 import os
+import sys
+
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(_CURRENT_DIR))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 import json
 import datetime
 from typing import List, Dict, Any
@@ -68,8 +75,10 @@ def screen_resonance_pool(valid_stocks: List[str], max_pool_size: int = 200) -> 
 
     # 1. 批量下载最近60个交易日日K线
     start_date = (datetime.datetime.now() - datetime.timedelta(days=120)).strftime('%Y%m%d')
+    print(f">> 正在下载/同步 {len(valid_stocks)} 只标的日线行情 (首次下载约需1~2分钟，请稍候)...")
     try:
         xtdata.download_history_data2(valid_stocks, period='1d', start_time=start_date)
+        print(">> 日线历史行情下载完成，开始批量读取与计算技术因子...")
     except Exception as e:
         print(f"下载历史日线数据提示/警告: {e}")
 
@@ -81,6 +90,7 @@ def screen_resonance_pool(valid_stocks: List[str], max_pool_size: int = 200) -> 
         count=60
     )
 
+    print(">> 正在计算三大指标共振 (均量金叉 + RSI>55突破 + OBV金叉)...")
     resonance_list = []
     for code in valid_stocks:
         df = kline_dict.get(code)
@@ -100,14 +110,11 @@ def screen_resonance_pool(valid_stocks: List[str], max_pool_size: int = 200) -> 
         ma20 = df['close'].rolling(20).mean().iloc[-1]
         ret_5d = (df['close'].iloc[-1] / df['close'].iloc[-6] - 1.0) if len(df) >= 6 else 0.0
 
-        # 获取流通市值信息 (优先从 xtdata 获取总市值/流通股本估算)
+        # 获取流通市值信息
         detail = xtdata.get_instrument_detail(code) or {}
         name = detail.get('InstrumentName', '')
         float_volume = detail.get('FloatVolume', 0)
-        # 流通市值（元）
         float_market_cap = float_volume * close if float_volume > 0 else 0.0
-
-        # 近期日均换手率估算
         turnover_rate = (df['volume'].iloc[-1] / float_volume * 100.0) if float_volume > 0 else 0.0
 
         resonance_list.append({
@@ -182,9 +189,9 @@ def run_daily_selection(save_path: str = 'data/target_pool.json') -> List[Dict[s
         List[Dict[str, Any]]: 最终精选买入标的列表
     """
     today_str = datetime.datetime.now().strftime('%Y%m%d')
-    print(f"==================================================")
+    print("==================================================")
     print(f"[{today_str}] 启动盘后选股流程 (三指标共振 + 强势股精选)")
-    print(f"==================================================")
+    print("==================================================")
 
     # 1. 获取沪深A股全市场标的
     all_stocks = xtdata.get_stock_list_in_sector('沪深A股')

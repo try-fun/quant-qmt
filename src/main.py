@@ -3,7 +3,15 @@
 量化交易系统主入口 (MiniQMT xtquant)
 支持命令行快速触发盘后选股器、盘中持仓风控执行引擎或单标的行情下载
 """
+import os
 import sys
+
+# 动态将项目根目录加入 sys.path，确保支持 python src/main.py 与 python.exe .\src\main.py 直接调用
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT = os.path.dirname(_CURRENT_DIR)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 import argparse
 import datetime
 from src.strategy.screener import run_daily_selection
@@ -24,8 +32,9 @@ def main():
 
     args = parser.parse_args()
 
+    now_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("==================================================")
-    print(f"[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] 启动模式: {args.mode}")
+    print(f"[{now_str}] 启动模式: {args.mode}")
     print("==================================================")
 
     if args.mode == "screen":
@@ -40,7 +49,7 @@ def main():
         executor.run_trading_loop(poll_interval=5)
 
     elif args.mode == "download":
-        start_date = datetime.datetime.now().strftime("%Y%m%d")
+        start_date = datetime.datetime.now().strftime('%Y%m%d')
         print(f">> 下载股票 {args.stock} 的 {args.period} 行情数据...")
         download_one_stock_data(args.stock, args.period, start_date, "")
 

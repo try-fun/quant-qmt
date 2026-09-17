@@ -10,7 +10,7 @@
 本项目是基于迅投 **MiniQMT (xtquant)** 原生 Python SDK 构建的 A 股量化交易与行情数据管理系统。主要功能包括：
 - **实时与历史行情数据获取**：基于 `xtquant.xtdata` 提供多周期（Tick、1m、5m、1d 等）行情订阅与历史数据落盘。
 - **实盘/模拟交易接入**：基于 `xtquant.xttrader` 实现委托下单、撤单、资产查询、持仓监控及异步回调处理。
-- **数据持久化与状态管理**：基于 `MongoEngine` (MongoDB ODM) 实现账户资产、委托订单、成交明细、持仓股票以及股票元数据的持久化。
+- **本地轻量数据持久化**：采用原子化 JSON 文件（`data/*.json`）实现账户资产、委托订单、成交明细、持仓股票以及盘后选股目标池的持久化与直观查看。
 
 ### 1.2 目录结构规范
 
@@ -19,33 +19,36 @@ qmt/
 ├── README.md              # 项目简要说明与官方文档索引
 ├── Makefile               # 项目常用构建与清理命令 (make clean 等)
 ├── requirements.txt       # Python 依赖清单
-├── agents.md              # 本规范文档 (AI Agent & 开发者操作指南)
+├── AGENTS.md              # 本规范文档 (AI Agent & 开发者操作指南)
+├── data/                  # 本地 JSON 数据持久化目录
+│   ├── target_pool.json   # 每日盘后选股目标池
+│   ├── account.json       # 资金账户资产最新快照
+│   ├── positions.json     # 当前持仓股票明细列表
+│   ├── orders.json        # 委托订单历史与状态记录
+│   └── trades.json        # 实际成交明细记录
 └── src/
     ├── __init__.py
-    ├── main.py            # 主程序入口 (策略调度/历史数据下载等)
+    ├── main.py            # 主程序入口 (选股/实盘交易/数据下载等)
     ├── config/            # 配置管理模块
     │   ├── __init__.py
     │   ├── config.py      # 配置读取单例类与 Dataclass 映射
     │   ├── config.ini     # 生产/默认配置文件 (不得提交敏感凭据)
     │   └── config-dev.ini # 本地开发测试配置文件
-    ├── db/                # 数据持久化层 (MongoEngine Models)
-    │   ├── __init__.py    # 自动执行 init_mongodb() 初始化连接
-    │   ├── mongo.py       # MongoDB 基础连接逻辑
-    │   ├── base_model.py  # BaseModel 抽象基类 (封装常用 CRUD 与分页逻辑)
-    │   ├── account.py     # 资金账户模型 (tb_account)
-    │   ├── order_model.py # 委托订单模型 (tb_order)
-    │   ├── position_model.py # 持仓模型 (tb_position)
-    │   ├── trade_model.py # 成交记录模型 (tb_trade)
-    │   └── stock_model.py # 股票标的元数据模型 (tb_stock)
+    ├── strategy/          # 策略与风控执行引擎
+    │   ├── __init__.py
+    │   ├── factors.py     # 技术指标与多因子共振计算 (KDJ, RSI, MACD, BOLL 等)
+    │   ├── screener.py    # 每日盘后选股器 (全市场初筛 + Top 20 精选)
+    │   └── executor.py    # 盘中交易与持仓风控执行引擎 (开盘建仓 + 止盈止损)
     └── service/           # 业务逻辑与 MiniQMT 交互服务
         ├── __init__.py
-        ├── qmt_connnect.py# QMT 客户端连接、账号初始化、异步任务调度
-        ├── trading.py     # 核心交易事件循环、行情回调与交易决策
+        ├── storage.py     # JSON 原子安全读写底层工具
+        ├── qmt_connnect.py# QMT 客户端连接、账号初始化、数据下载
+        ├── trading.py     # 核心交易事件循环、行情回调与交易决策示例
         ├── stock.py       # 股票价格获取与行情监控工具
-        ├── account.py     # 资金账户信息同步入库
-        ├── order.py       # 委托订单信息同步入库
-        ├── positions.py   # 持仓信息同步入库
-        ├── trade.py       # 成交回报信息同步入库
+        ├── account.py     # 资金账户信息 JSON 同步
+        ├── order.py       # 委托订单信息 JSON 幂等同步
+        ├── positions.py   # 持仓信息 JSON 同步
+        ├── trade.py       # 成交回报信息 JSON 幂等同步
         └── test_market_data.py # 行情数据测试脚本
 ```
 
@@ -76,9 +79,9 @@ qmt/
 - **防重复下单（Idempotency & Throttling）**：
   - 必须维护本地订单防重状态（如 `is_buy` 标志、订单状态机或冷却时间戳），严禁在行情高频 Tick 推送中短时间内对同一标的重复无节制发送买入/卖出指令。
 - **异步回调与非阻塞原则**：
-  - 在 `on_quote` 行情回调与 `on_stock_order` / `on_stock_trade` 交易回调中，**严禁执行高耗时同步阻塞操作**（如大批量数据库查询、耗时网络请求或密集型数学运算），以避免堵塞 QMT 底层通信队列。耗时任务需放入异步队列或独立线程。
+  - 在 `on_quote` 行情回调与 `on_stock_order` / `on_stock_trade` 交易回调中，**严禁执行高耗时同步阻塞操作**（如网络请求或密集型数学运算），以避免堵塞 QMT 底层通信队列。
 - **凭证安全**：
-  - 严禁将资金账号、密码、数据库密码等敏感信息硬编码到代码或 Git 提交中。所有敏感参数必须通过配置文件或环境变量加载。
+  - 严禁将资金账号、密码等敏感信息硬编码到代码或 Git 提交中。所有敏感参数必须通过配置文件或环境变量加载。
 
 ---
 
@@ -117,7 +120,7 @@ def start_trader():
     # 1. 获取配置与创建账户对象
     qmt_cfg = get_qmt_cfg()
     account_cfg = get_account_cfg()
-    acc = StockAccount(account_cfg.stock_account, 'STOCK')
+    acc = StockAccount(account_cfg.stock_account, "STOCK")
 
     # 2. 实例化交易客户端 (唯一 Session ID)
     session_id = int(time.time())
@@ -188,12 +191,12 @@ from xtquant import xtdata
 def subscribe_market_quote(stock_code: str, callback_fn):
     """
     订阅实时 Tick / 分钟行情
-    标的代码规范: '000001.SZ', '600000.SH', '830000.BJ'
+    标的代码规范: 000001.SZ, 600000.SH, 830000.BJ
     """
-    seq = xtdata.subscribe_quote(stock_code, period='tick', callback=callback_fn)
+    seq = xtdata.subscribe_quote(stock_code, period="tick", callback=callback_fn)
     return seq
 
-def fetch_history_data(stock_code: str, period: str = '1d', start_time: str = '20240101', end_time: str = ''):
+def fetch_history_data(stock_code: str, period: str = "1d", start_time: str = "20240101", end_time: str = ""):
     """
     下载并读取历史行情
     """
@@ -201,7 +204,7 @@ def fetch_history_data(stock_code: str, period: str = '1d', start_time: str = '2
     xtdata.download_history_data(stock_code, period=period, start_time=start_time, end_time=end_time)
     # 读取市场数据
     data = xtdata.get_market_data_ex(
-        field_list=['time', 'open', 'high', 'low', 'close', 'volume', 'amount'],
+        field_list=["time", "open", "high", "low", "close", "volume", "amount"],
         stock_list=[stock_code],
         period=period,
         start_time=start_time,
@@ -212,28 +215,27 @@ def fetch_history_data(stock_code: str, period: str = '1d', start_time: str = '2
 
 ---
 
-## 4. 数据持久化与 MongoDB 规范
+## 4. 本地 JSON 数据持久化规范
 
-### 4.1 数据库分层与基类设计
-- 数据库连接配置统一位于 `src/config/`，通过 `src/db/mongo.py` 的 `init_mongodb()` 进行统一初始化。
-- 所有数据模型必须继承 `src/db/base_model.py` 中的 `BaseModel`。
-- `BaseModel` 封装了常用的增删改查方法（`add`, `update`, `delete`, `get_by_id`, `list`, `list_by`, `page`, `count` 等）。
+### 4.1 持久化分层与存储设计
+- 所有数据落盘统一存放于 `data/` 目录。
+- 采用 `src/service/storage.py` 中的 `save_json`（基于原子替换 `os.replace`）与 `load_json` 实现安全无损读写。
 
-### 4.2 核心集合与字段对应表
+### 4.2 核心数据文件说明
 
-| 集合名称 (`collection`) | 模型类 (`Model`) | 对应 QMT 对象 / 概念 | 关键字段说明 |
+| 文件路径 | 对应数据模型 | 对应 QMT 对象 / 概念 | 关键字段说明 |
 | :--- | :--- | :--- | :--- |
-| `tb_account` | `AccountModel` | `XtAsset` (资金账户) | `account_id`, `account_type`, `cash`, `frozen_cash`, `market_value`, `total_asset` |
-| `tb_position` | `PositionModel` | `XtPosition` (持仓) | `stock_code`, `volume`, `can_use_volume`, `open_price`, `market_value`, `avg_price` |
-| `tb_order` | `OrderModel` | `XtOrder` (委托订单) | `order_id`, `order_sysid`, `stock_code`, `order_type`, `order_volume`, `price`, `order_status` |
-| `tb_trade` | `TradeModel` | `XtTrade` (成交明细) | `traded_id`, `order_id`, `stock_code`, `traded_price`, `traded_volume`, `traded_amount` |
-| `tb_stock` | `StockModel` | 证券基础信息 | `code`, `exchange_id`, `instrument_name`, `open_date`, `expire_date` |
+| `data/account.json` | 资金账户快照 | `XtAsset` (资金账户) | `account_id`, `account_type`, `cash`, `frozen_cash`, `market_value`, `total_asset`, `update_time` |
+| `data/positions.json` | 持仓明细列表 | `XtPosition` (持仓) | `stock_code`, `volume`, `can_use_volume`, `open_price`, `market_value`, `yesterday_volume` |
+| `data/orders.json` | 委托订单记录 | `XtOrder` (委托订单) | `order_id`, `order_sysid`, `stock_code`, `order_type`, `order_volume`, `price`, `order_status`, `create_time` |
+| `data/trades.json` | 成交明细记录 | `XtTrade` (成交明细) | `traded_id`, `order_id`, `stock_code`, `traded_price`, `traded_volume`, `traded_amount`, `create_time` |
+| `data/target_pool.json` | 盘后选股标的池 | 策略选股产物 | `date`, `count`, `targets`, `target_codes` |
 
 ### 4.3 同步更新幂等性准则
-在 `service/` 中实现同步函数（如 `update_order`, `update_position`, `update_trade`, `update_account`）时，**必须满足幂等性**：
-1. 优先根据主键/业务唯一键（如 `order_id`、`traded_id`、`stock_code`、`account_id`）检索已有记录；
-2. 若记录存在则更新变动字段并更新 `update_time`；
-3. 若记录不存在则新建对象，设置 `create_time` 与 `update_time` 后保存。
+在 `service/` 中实现同步函数（`update_order`, `update_position`, `update_trade`, `update_account`）时，**必须满足幂等性**：
+1. 优先根据业务唯一键（如 `order_id`、`traded_id`、`stock_code`）检索已有记录；
+2. 若记录存在则更新变动字段，保留初次创建的 `create_time`，并更新 `update_time`；
+3. 若记录不存在则新增记录追加到列表中。
 
 ---
 
@@ -286,9 +288,9 @@ def fetch_history_data(stock_code: str, period: str = '1d', start_time: str = '2
    - 保持现有注释与逻辑的完整性，严禁破坏已有的字段映射与持久化逻辑。
 2. **配置与连接管理规范**：
    - 禁止在业务代码中硬编码 IP、密码、账号或本地绝对路径。
-   - 统一通过 `src.config.config` 读取 `MongoDBCfg`、`AccountCfg`、`QMTCfg`。
-3. **数据库操作规范**：
-   - 统一使用 `src.db` 下的数据模型与 `BaseModel` 提供的封装方法，确保增改操作幂等。
+   - 统一通过 `src.config.config` 读取 `AccountCfg`、`QMTCfg`。
+3. **数据操作规范**：
+   - 统一使用 `src.service` 下的 `update_account`、`update_position`、`update_order`、`update_trade` 与 `storage.py` 进行持久化，确保增改操作幂等。
 4. **测试与日常运维规范**：
    - 使用 `service/test_market_data.py` 进行行情接口验证与调试。
    - 定期执行 `make clean` 清除 `__pycache__` 与编译临时缓存。
@@ -296,4 +298,3 @@ def fetch_history_data(stock_code: str, period: str = '1d', start_time: str = '2
    - 虚拟环境激活路径：`source /Users/zhouyi/workplace/python/quant/qmt/.venv/bin/activate`
    - Python 解释器直接路径：`/Users/zhouyi/workplace/python/quant/qmt/.venv/bin/python`
    - 运行任何脚本、执行依赖管理或测试时，必须使用此虚拟环境。
-

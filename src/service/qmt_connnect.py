@@ -218,8 +218,10 @@ async def exec_buy():
     while True:
         print("exec_buy....")
         try:
-            # 查询所有is_buy=True的股票
-            buy_signals = StockModel.list_by({'is_buy': True})
+            # 查询 target_pool.json 中的标的
+            from src.service.storage import load_json
+            target_data = load_json('data/target_pool.json', default={})
+            buy_signals = target_data.get('targets', [])
 
             if buy_signals:
                 print(f"找到 {len(buy_signals)} 个买入信号")
@@ -260,10 +262,7 @@ async def exec_buy():
                             acc, stock.code, xtconstant.STOCK_BUY, buy_vol, xtconstant.FIX_PRICE, buy_price, '', f'备注：自动买入{stock.instrument_name}')
                         print(f"订单ID: {fix_result_order_id}")
 
-                        # 将is_buy标记为False，避免重复买入
-                        StockModel.update_by(
-                            {'code': stock.code}, {'is_buy': False})
-                        print(f"已更新 {stock.code} 的买入状态为False")
+                        print(f"已完成 {stock.get('code', '')} 下单买入")
 
                     except Exception as e:
                         print(f"处理股票 {stock.code} 时发生错误: {e}")

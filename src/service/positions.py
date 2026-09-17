@@ -1,34 +1,64 @@
 # coding=gbk
-from xtquant.xtpythonclient import XtPosition
+"""
+持仓服务：同步与持久化持仓股票信息至本地 JSON 文件
+"""
 import datetime
-from src.db.position_model import PositionModel
+from typing import Union, List, Dict, Any
+from src.service.storage import save_json, load_json
+
+POSITIONS_FILE = "data/positions.json"
 
 
-def update_position(positions):
+def update_position(positions: Union[Any, List[Any]], file_path: str = POSITIONS_FILE) -> bool:
     """
-    同步持仓信息至数据库
-    :param positions: XtPosition 对象列表或单个 XtPosition
+    同步并持久化持仓列表至本地 JSON
+
+    Args:
+        positions: XtPosition 对象列表或单个 XtPosition
+        file_path (str): 目标 JSON 文件路径，默认 data/positions.json
+
+    Returns:
+        bool: 是否持久化成功
     """
-    if not positions:
-        return
+    if positions is None:
+        return False
+
     if not isinstance(positions, list):
         positions = [positions]
 
-    for position in positions:
-        model = PositionModel.objects(stock_code=position.stock_code).first()
-        if model is None:
-            model = PositionModel()
-            model.create_time = datetime.datetime.now()
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    records = []
 
-        model.account_type = position.account_type
-        model.account_id = position.account_id
-        model.stock_code = position.stock_code
-        model.volume = position.volume
-        model.can_use_volume = position.can_use_volume
-        model.open_price = position.open_price
-        model.market_value = position.market_value
-        model.frozen_volume = position.frozen_volume
-        model.on_road_volume = position.on_road_volume
-        model.yesterday_volume = position.yesterday_volume
-        model.update_time = datetime.datetime.now()
-        model.save()
+    for pos in positions:
+        stock_code = getattr(pos, "stock_code", "")
+        if not stock_code:
+            continue
+
+        records.append({
+            "stock_code": stock_code,
+            "account_id": str(getattr(pos, "account_id", "")),
+            "account_type": int(getattr(pos, "account_type", 0)),
+            "volume": int(getattr(pos, "volume", 0)),
+            "can_use_volume": int(getattr(pos, "can_use_volume", 0)),
+            "open_price": round(float(getattr(pos, "open_price", 0.0)), 2),
+            "market_value": round(float(getattr(pos, "market_value", 0.0)), 2),
+            "frozen_volume": int(getattr(pos, "frozen_volume", 0)),
+            "on_road_volume": int(getattr(pos, "on_road_volume", 0)),
+            "yesterday_volume": int(getattr(pos, "yesterday_volume", 0)),
+            "update_time": now_str
+        })
+
+    return save_json(file_path, records)
+
+
+def get_positions(file_path: str = POSITIONS_FILE) -> List[Dict[str, Any]]:
+    """
+    从本地 JSON 读取当前持仓列表
+
+    Args:
+        file_path (str): 目标 JSON 文件路径
+
+    Returns:
+        List[Dict[str, Any]]: 持仓列表
+    """
+    return load_json(file_path, default=[])
